@@ -4,6 +4,7 @@ use std::fs;
 use std::io;
 use std::io::prelude::*;
 use std::io::{ ErrorKind };
+use rand::Rng;
 
 const TAG_ARGUMENT_NOT_VALID: &str = "ArgumentNotValid";
 
@@ -34,24 +35,25 @@ impl Process {
 		()
 	}
 	
+	
 	fn add(&mut self, reg1: usize, reg2: usize, reg3: usize) -> Result<(), ErrorKind> {
 		if [reg1, reg2, reg3].iter().any(|&x| x > 7) {
 			return Err(ErrorKind::InvalidData);
 		}
 		else {
-			self.registers[reg1] = self.registers[reg2] + self.registers[reg3];
+			self.registers[reg1] = add_overflow(self.registers[reg2], self.registers[reg3]);
 			Ok(())
 		}
 	}
 	
-	fn io(&mut self, reg1: usize, reg2: usize) -> Result<(), ErrorKind>{
-		if [reg1, reg2].iter().any(|&x| x > 7) {
+	fn io(&mut self, reg: usize) -> Result<(), ErrorKind>{
+		if reg > 7 {
 			return Err(ErrorKind::InvalidData); 
 		}
 		else {
-			match self.registers[reg1] {
+			match self.registers[reg] {
 				0 => {
-					println!("{}", self.registers[reg2]);
+					println!("{}", self.registers[3]);
 					Ok(())
 				}
 				1 => {
@@ -59,7 +61,7 @@ impl Process {
 					io::stdin().read_line(&mut input).expect("Invalid input");
 					let input_num: i32 = input.trim().parse().expect("Invalid input");
 
-					self.registers[reg2] = input_num;
+					self.registers[3] = add_overflow(self.registers[3], input_num);
 					Ok(())
 				}
 				_ => {
@@ -70,6 +72,22 @@ impl Process {
 	}
 }
 
+/// Emulate integer overflow resulting in going negative/positive
+fn add_overflow(a: i32, b: i32) -> i32 {
+	let sum = a as i64 + b as i64;
+	let max = i32::MAX as i64;
+	let min = i32::MIN as i64;
+
+	if sum > max {
+		(sum - max + min) as i32
+	}
+	else if sum < min {
+		(sum - min + max) as i32
+	}
+	else {
+		sum as i32
+	}
+}
 
 /// print error message, "inspired" by Viola
 fn print_error(tag: &str, err_msg: &str) {
@@ -118,12 +136,12 @@ fn test() {
 	println!();
 	
 	println!("input");
-	process.io(0, 3);
+	process.io(0);
 	println!("{:?}", process);
 	println!();
 		
 	println!("print");
-	process.io(4, 3);
+	process.io(4);
 	println!();
 
 }
