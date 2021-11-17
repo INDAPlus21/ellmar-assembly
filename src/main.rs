@@ -8,6 +8,8 @@ use rand::Rng;
 
 const TAG_ARGUMENT_NOT_VALID: &str = "ArgumentNotValid";
 
+const io_register: usize = 2;
+
 
 struct Process {
 	registers: [i32; 8]
@@ -26,15 +28,20 @@ impl fmt::Debug for Process {
 
 impl Process {
 	fn new() -> Process {
+		let mut rng = rand::thread_rng();
 		Process {
-			registers: [1, -1, 0, 0, 0, 0, 0, 0]
+			registers: [
+				1, 
+				-1, 
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				]
 		}
 	}
-	
-	fn new_with_random() {
-		()
-	}
-	
 	
 	fn add(&mut self, reg1: usize, reg2: usize, reg3: usize) -> Result<(), ErrorKind> {
 		if [reg1, reg2, reg3].iter().any(|&x| x > 7) {
@@ -53,7 +60,7 @@ impl Process {
 		else {
 			match self.registers[reg] {
 				0 => {
-					println!("{}", self.registers[3]);
+					println!("{}", self.registers[io_register]);
 					Ok(())
 				}
 				1 => {
@@ -61,7 +68,7 @@ impl Process {
 					io::stdin().read_line(&mut input).expect("Invalid input");
 					let input_num: i32 = input.trim().parse().expect("Invalid input");
 
-					self.registers[3] = add_overflow(self.registers[3], input_num);
+					self.registers[io_register] = add_overflow(self.registers[io_register], input_num);
 					Ok(())
 				}
 				_ => {
