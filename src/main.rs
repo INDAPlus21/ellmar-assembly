@@ -5,6 +5,34 @@ use std::io::{ ErrorKind };
 
 const TAG_ARGUMENT_NOT_VALID: &str = "ArgumentNotValid";
 
+
+struct Process {
+    registers: [i32; 8]
+}
+
+impl Process {
+    fn new() -> Process {
+        Process {
+            registers: [1, -1, 0, 0, 0, 0, 0, 0]
+        }
+    }
+    
+    fn new_with_random() {
+        ()
+    }
+    
+    fn add(&mut self, reg1: usize, reg2: usize, reg3: usize) -> Result<(), ErrorKind> {
+        if [reg1, reg2, reg3].iter().any(|&x| x > 7) {
+            return Err(ErrorKind::InvalidData)
+        }
+        else {
+            self.registers[reg1] = self.registers[reg2] + self.registers[reg3];
+            Ok(())
+        }
+    }
+}
+
+
 /// print error message, "inspired" by Viola
 fn print_error(tag: &str, err_msg: &str) {
     println!("[ERROR] {}: {}", tag, err_msg)
@@ -45,5 +73,9 @@ fn parse_file() -> Result<(), ErrorKind>{
 }
 
 fn main() {
-    parse_file();
+    let mut process = Process::new();
+    process.add(2, 2, 0);
+    for num in process.registers {
+        println!("{}", num)
+    }
 }
