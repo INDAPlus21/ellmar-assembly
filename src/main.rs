@@ -1,5 +1,7 @@
+use std::fmt;
 use std::env;
 use std::fs;
+use std::io;
 use std::io::prelude::*;
 use std::io::{ ErrorKind };
 
@@ -8,6 +10,17 @@ const TAG_ARGUMENT_NOT_VALID: &str = "ArgumentNotValid";
 
 struct Process {
     registers: [i32; 8]
+}
+
+impl fmt::Debug for Process {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut repr: String = String::new();
+        for reg in self.registers{
+            repr.push_str(&reg.to_string());
+            repr.push_str("; ");
+        }
+        write!(f, "{}", repr)
+    }
 }
 
 impl Process {
@@ -23,11 +36,36 @@ impl Process {
     
     fn add(&mut self, reg1: usize, reg2: usize, reg3: usize) -> Result<(), ErrorKind> {
         if [reg1, reg2, reg3].iter().any(|&x| x > 7) {
-            return Err(ErrorKind::InvalidData)
+            return Err(ErrorKind::InvalidData);
         }
         else {
             self.registers[reg1] = self.registers[reg2] + self.registers[reg3];
             Ok(())
+        }
+    }
+    
+    fn io(&mut self, reg1: usize, reg2: usize) -> Result<(), ErrorKind>{
+        if [reg1, reg2].iter().any(|&x| x > 7) {
+            return Err(ErrorKind::InvalidData); 
+        }
+        else {
+            match self.registers[reg1] {
+                0 => {
+                    println!("{}", self.registers[reg2]);
+                    Ok(())
+                }
+                1 => {
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).expect("Invalid input");
+                    let input_num: i32 = input.trim().parse().expect("Invalid input");
+
+                    self.registers[reg2] = input_num;
+                    Ok(())
+                }
+                _ => {
+                    return Err(ErrorKind::InvalidData);
+                }
+            }
         }
     }
 }
@@ -72,10 +110,24 @@ fn parse_file() -> Result<(), ErrorKind>{
     }
 }
 
-fn main() {
+fn test() {
     let mut process = Process::new();
+    println!("add");
     process.add(2, 2, 0);
-    for num in process.registers {
-        println!("{}", num)
-    }
+    println!("{:?}", process);
+    println!();
+    
+    println!("input");
+    process.io(0, 3);
+    println!("{:?}", process);
+    println!();
+        
+    println!("print");
+    process.io(4, 3);
+    println!();
+
+}
+
+fn main() {
+    test();
 }
