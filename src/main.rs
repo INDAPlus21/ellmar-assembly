@@ -30,10 +30,8 @@ impl Process {
 			registers: [
 				1, 
 				-1, 
-//				rng.gen::<i32>(),
-				0,
-				0,
-//				rng.gen::<i32>(),
+				rng.gen::<i32>(),
+				rng.gen::<i32>(),
 				rng.gen::<i32>(),
 				rng.gen::<i32>(),
 				rng.gen::<i32>(),
@@ -78,7 +76,7 @@ impl Process {
 	}
 	
 	fn skip(&mut self, reg1: usize, reg2: usize) -> bool {
-		self.registers[reg1] != self.registers[reg2]
+		self.registers[reg1] == self.registers[reg2]
 	}
 
 	fn run (&mut self, instructions: Vec<Vec<(String, i32, Option<i32>)>>) {
@@ -100,7 +98,7 @@ impl Process {
 						}
 					}
 					"j" => {
-						line_idx += self.registers[instruction.1 as usize] as usize - 1;
+						line_idx = (line_idx as i32 + self.registers[instruction.1 as usize] - 1) as usize; // todo handle out of range
 						break;
 					}
 					_ => ()
