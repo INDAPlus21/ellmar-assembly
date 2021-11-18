@@ -51,7 +51,7 @@ impl Process {
 		}
 	}
 	
-	fn io(&mut self, reg1: usize, reg2) -> Result<(), ErrorKind>{
+	fn io(&mut self, reg1: usize, reg2: usize) -> Result<(), ErrorKind>{
 		if [reg1, reg2].iter().any(|&x| x > 7) {
 			return Err(ErrorKind::InvalidData); 
 		}
@@ -103,6 +103,46 @@ fn print_error(tag: &str, err_msg: &str) {
 	println!("[ERROR] {}: {}", tag, err_msg)
 }
 
+fn read_instructions(lines: Vec<String>) -> Vec<(String, i32, Option<i32>)>{
+	let mut instructions: Vec<(String, i32, Option<i32>)> = Vec::new(); // return value
+	let mut comment_result: std::option::Option<usize>; // index of comment 
+	let mut end_index: usize; //index of comment
+	let mut line_content: Vec<&str>; // substrings of line seperated by whitespace
+
+	// get index of comment in line
+	for line in &lines{
+		// get index of comment in line
+		comment_result = line.chars().position(|ch| ch == '/');
+		end_index = if comment_result.is_none() {line.len()} else {comment_result.unwrap()};
+
+		if end_index != 0 { // if line is not commented out
+			line_content = (line[..end_index]).split_whitespace().collect();
+			for (i, thing) in line_content.iter().enumerate() {
+				match thing {
+
+					&"add" | &"io" | &"sk" => {
+						instructions.push((
+							thing.to_string(),
+							line_content[i+1].parse::<i32>().unwrap(),
+							Some(line_content[i+2].parse::<i32>().unwrap())
+						))
+					}
+					&"j" => {
+						instructions.push((
+							thing.to_string(),
+							line_content[i+1].parse::<i32>().unwrap(),
+							None
+						))
+					}
+					_ => ()
+			
+				}
+			}
+		}
+	}
+	instructions
+}
+
 fn parse_file() -> Result<(), ErrorKind>{
 	// get arguments from terminal
 	let args: Vec<String> = env::args().collect();
@@ -140,19 +180,14 @@ fn parse_file() -> Result<(), ErrorKind>{
 fn test() {
 	let mut process = Process::new();
 	println!("add");
-	process.add(2, 2, 0);
+	process.add(2, 0);
 	println!("{:?}", process);
 	println!();
 	
 	println!("input");
-	process.io(0);
+	process.io(0, 4);
 	println!("{:?}", process);
 	println!();
-		
-	println!("print");
-	process.io(4);
-	println!();
-
 }
 
 fn main() {
