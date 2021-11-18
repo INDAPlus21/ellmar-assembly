@@ -2,7 +2,7 @@
 
 Instruction | Description
 -- | --
-add | r1 = r2 + r3
-j | jump lines specified in adress
-sk | skip 1 line if r1 == r2
-io | if reg = 0: print third register, if reg = 1: add user input to third register
+add | r1 = r1 + r2
+j | jump lines specified reg
+sk | skip 1 line if r1 != r2
+io | if reg1 = 0: print reg2, if reg1 = 1: add user input to reg2

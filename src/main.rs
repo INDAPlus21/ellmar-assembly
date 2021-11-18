@@ -8,8 +8,6 @@ use rand::Rng;
 
 const TAG_ARGUMENT_NOT_VALID: &str = "ArgumentNotValid";
 
-const io_register: usize = 2;
-
 
 struct Process {
 	registers: [i32; 8]
@@ -43,24 +41,24 @@ impl Process {
 		}
 	}
 	
-	fn add(&mut self, reg1: usize, reg2: usize, reg3: usize) -> Result<(), ErrorKind> {
-		if [reg1, reg2, reg3].iter().any(|&x| x > 7) {
+	fn add(&mut self, reg1: usize, reg2: usize) -> Result<(), ErrorKind> {
+		if [reg1, reg2].iter().any(|&x| x > 7) {
 			return Err(ErrorKind::InvalidData);
 		}
 		else {
-			self.registers[reg1] = add_overflow(self.registers[reg2], self.registers[reg3]);
+			self.registers[reg1] = add_overflow(self.registers[reg1], self.registers[reg2]);
 			Ok(())
 		}
 	}
 	
-	fn io(&mut self, reg: usize) -> Result<(), ErrorKind>{
-		if reg > 7 {
+	fn io(&mut self, reg1: usize, reg2) -> Result<(), ErrorKind>{
+		if [reg1, reg2].iter().any(|&x| x > 7) {
 			return Err(ErrorKind::InvalidData); 
 		}
 		else {
-			match self.registers[reg] {
+			match self.registers[reg1] {
 				0 => {
-					println!("{}", self.registers[io_register]);
+					println!("{}", self.registers[reg2]);
 					Ok(())
 				}
 				1 => {
@@ -68,7 +66,7 @@ impl Process {
 					io::stdin().read_line(&mut input).expect("Invalid input");
 					let input_num: i32 = input.trim().parse().expect("Invalid input");
 
-					self.registers[io_register] = add_overflow(self.registers[io_register], input_num);
+					self.registers[reg2] = add_overflow(self.registers[reg2], input_num);
 					Ok(())
 				}
 				_ => {
@@ -76,6 +74,10 @@ impl Process {
 				}
 			}
 		}
+	}
+	
+	fn skip(&mut self, reg1: usize, reg2: usize) -> bool {
+		self.registers[reg1] != self.registers[reg2]
 	}
 }
 
@@ -114,7 +116,7 @@ fn parse_file() -> Result<(), ErrorKind>{
 			Ok(_contents) => {
 				println!("Running file: {:?}\n", args[1]);
 
-				// get non-empty lines
+				// get lines
 				let lines: Vec<String> = _contents
 					.split("\n")
 					.map(|_line| _line.to_string())
