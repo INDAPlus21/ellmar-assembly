@@ -30,12 +30,18 @@ impl Process {
 			registers: [
 				1, 
 				-1, 
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
+				-5,
+				-5,
+				-5,
+				-5,
+				-5,
+				-5,
+// 				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
 				]
 		}
 	}
