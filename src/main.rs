@@ -2,7 +2,6 @@ use std::fmt;
 use std::env;
 use std::fs;
 use std::io;
-use std::io::prelude::*;
 use std::io::{ ErrorKind };
 use rand::Rng;
 
@@ -31,8 +30,10 @@ impl Process {
 			registers: [
 				1, 
 				-1, 
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
+//				rng.gen::<i32>(),
+				0,
+				0,
+//				rng.gen::<i32>(),
 				rng.gen::<i32>(),
 				rng.gen::<i32>(),
 				rng.gen::<i32>(),
@@ -79,6 +80,35 @@ impl Process {
 	fn skip(&mut self, reg1: usize, reg2: usize) -> bool {
 		self.registers[reg1] != self.registers[reg2]
 	}
+
+	fn run (&mut self, instructions: Vec<Vec<(String, i32, Option<i32>)>>) {
+		let mut line_idx: usize = 0;
+		while line_idx < instructions.len() {
+			for instruction in &instructions[line_idx] {
+				match &instruction.0[..] {
+					"add" => {
+						self.add(instruction.1 as usize, instruction.2.unwrap() as usize);
+					}
+					"io" => {
+						self.io(instruction.1 as usize, instruction.2.unwrap() as usize);
+					}
+					"sk" => {
+						if self.skip(instruction.1 as usize, instruction.2.unwrap() as usize) {
+							line_idx += 1;
+							break;
+
+						}
+					}
+					"j" => {
+						line_idx += self.registers[instruction.1 as usize] as usize - 1;
+						break;
+					}
+					_ => ()
+				}
+			}
+			line_idx += 1;
+		}
+	}
 }
 
 /// Emulate integer overflow resulting in going negative/positive
@@ -103,14 +133,17 @@ fn print_error(tag: &str, err_msg: &str) {
 	println!("[ERROR] {}: {}", tag, err_msg)
 }
 
-fn read_instructions(lines: Vec<String>) -> Vec<(String, i32, Option<i32>)>{
-	let mut instructions: Vec<(String, i32, Option<i32>)> = Vec::new(); // return value
-	let mut comment_result: std::option::Option<usize>; // index of comment 
-	let mut end_index: usize; //index of comment
+fn read_instructions(lines: Vec<String>) -> Vec<Vec<(String, i32, Option<i32>)>> {
+	let mut instructions: Vec<Vec<(String, i32, Option<i32>)>> = Vec::new(); // vector of lines
+	let mut line_instructions: Vec<(String, i32, Option<i32>)>; //instructions in one line
+	let mut comment_result: std::option::Option<usize>; // index of comment as result
+	let mut end_index: usize; //index of comment unpacked
 	let mut line_content: Vec<&str>; // substrings of line seperated by whitespace
 
 	// get index of comment in line
 	for line in &lines{
+		line_instructions = Vec::new(); // empty
+		
 		// get index of comment in line
 		comment_result = line.chars().position(|ch| ch == '/');
 		end_index = if comment_result.is_none() {line.len()} else {comment_result.unwrap()};
@@ -119,25 +152,24 @@ fn read_instructions(lines: Vec<String>) -> Vec<(String, i32, Option<i32>)>{
 			line_content = (line[..end_index]).split_whitespace().collect();
 			for (i, thing) in line_content.iter().enumerate() {
 				match thing {
-
 					&"add" | &"io" | &"sk" => {
-						instructions.push((
+						line_instructions.push((
 							thing.to_string(),
 							line_content[i+1].parse::<i32>().unwrap(),
 							Some(line_content[i+2].parse::<i32>().unwrap())
 						))
 					}
 					&"j" => {
-						instructions.push((
+						line_instructions.push((
 							thing.to_string(),
 							line_content[i+1].parse::<i32>().unwrap(),
 							None
 						))
 					}
 					_ => ()
-			
 				}
 			}
+			instructions.push(line_instructions);
 		}
 	}
 	instructions
@@ -161,6 +193,11 @@ fn parse_file() -> Result<(), ErrorKind>{
 					.split("\n")
 					.map(|_line| _line.to_string())
 					.collect();
+					
+					let instructions = read_instructions(lines);
+					let mut program = Process::new();
+					program.run(instructions);
+					println!("Finished running");
 
 				// Does this work?
 				return Ok(());
@@ -178,16 +215,7 @@ fn parse_file() -> Result<(), ErrorKind>{
 }
 
 fn test() {
-	let mut process = Process::new();
-	println!("add");
-	process.add(2, 0);
-	println!("{:?}", process);
-	println!();
-	
-	println!("input");
-	process.io(0, 4);
-	println!("{:?}", process);
-	println!();
+	parse_file();
 }
 
 fn main() {
