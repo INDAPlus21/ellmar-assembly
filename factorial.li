@@ -2,7 +2,7 @@
 
 add 1 1 / make #1 = -2
 
-add 2 0 / add #1 to #2
+add 2 0 / add 1 to #2
 sk 2 1 / skip line if #2 == -2
 j 1 / jump back 2 lines
 
@@ -11,7 +11,7 @@ add 2 0
 
 /// make #3 = 0
 
-add 3 0 / add #1 to #3
+add 3 0 / add 1 to #3
 sk 3 1 / skip line if #3 == -2
 j 1 / jump back 2 lines
 
@@ -20,7 +20,7 @@ add 3 0
 
 /// make #4 = 0
 
-add 4 0 / add #1 to #4
+add 4 0 / add 1 to #4
 sk 4 1 / skip line if #4 == -2
 j 1 / jump back 2 lines
 
@@ -29,7 +29,7 @@ add 4 0
 
 /// make #5 = 0
 
-add 5 0 / add #1 to #5
+add 5 0 / add 1 to #5
 sk 5 1 / skip line if #5 == -2
 j 1 / jump back 2 lines
 
@@ -38,7 +38,7 @@ add 5 0
 
 /// make #6 = 0
 
-add 6 0 / add #1 to #6
+add 6 0 / add 1 to #6
 sk 6 1 / skip line if #6 == -2
 j 1 / jump back 2 lines
 
@@ -67,10 +67,10 @@ io 0 5
 ///this will become the answer of factorial
 add 4 0
 
-/// Jump from bottom to mul
+/// Jump from bottom to mul is -7 lines
 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1
 
-/// jump in mul
+/// jump in mul is -3 lines
 add 3 1 add 3 1 add 3 1
 
 /// #4 = #4 * #5
