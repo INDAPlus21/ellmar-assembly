@@ -1,0 +1,96 @@
+/// make #2 = 0
+
+add 1 1 / make #1 = -2
+
+add 2 0 / add #1 to #2
+sk 2 1 / skip line if #2 == -2
+j 1 / jump back 2 lines
+
+add 2 0 / take #2 from -2 to 0
+add 2 0
+
+/// make #3 = 0
+
+add 3 0 / add #1 to #3
+sk 3 1 / skip line if #3 == -2
+j 1 / jump back 2 lines
+
+add 3 0 / take #3 from -2 to 0
+add 3 0
+
+/// make #4 = 0
+
+add 4 0 / add #1 to #4
+sk 4 1 / skip line if #4 == -2
+j 1 / jump back 2 lines
+
+add 4 0 / take #4 from -2 to 0
+add 4 0
+
+/// make #5 = 0
+
+add 5 0 / add #1 to #5
+sk 5 1 / skip line if #5 == -2
+j 1 / jump back 2 lines
+
+add 5 0 / take #5 from -2 to 0
+add 5 0
+
+/// make #6 = 0
+
+add 6 0 / add #1 to #6
+sk 6 1 / skip line if #6 == -2
+j 1 / jump back 2 lines
+
+add 6 0 / take #6 from -2 to 0
+add 6 0
+
+/// make #7 = 0
+
+add 7 0 / add 1 to #7
+sk 7 1 / skip line if #7 == -2
+j 1 / jump back 2 lines
+
+add 7 0 / take #7 from -2 to 0
+add 7 0
+
+add 1 0 / make #1 = -1 again
+
+/// State:
+    #0: 1
+    #1: -1
+    #2-#7: 0
+
+/// input to #5:
+io 0 5
+
+///this will become the answer of factorial
+add 4 0
+
+/// Jump from bottom to mul
+add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1 add 7 1
+
+/// jump in mul
+add 3 1 add 3 1 add 3 1
+
+/// #4 = #4 * #5
+    add 6 5 / add #5 to #6
+    add 4 1 / decrement 4
+    sk 4 2 / skip if 4 is zero
+    j 3 / jump -3
+    
+    add 4 6 / #4 = answer
+
+    add 3 0 / #3 = -2
+    
+    add 6 1 / #6 = 0
+    sk 6 2
+    j 3
+    
+    add 3 1 / #3 = -3
+
+add 5 1 / decrement #5
+sk 5 2
+j 7
+
+io 2 4
