@@ -83,15 +83,6 @@ add 3 0
 
 io 2 6 / print result
 
-io 2 0
-io 2 1
-io 2 2
-io 2 3
-io 2 4
-io 2 5
-io 2 6
-io 2 7
-
 ///state:
 / #0 = 1 
 / #1 = -1 
