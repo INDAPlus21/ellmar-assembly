@@ -24,19 +24,34 @@ impl fmt::Debug for Process {
 }
 
 impl Process {
-	fn new() -> Process {
+	fn new(random: bool) -> Process {
+		if random {
 		let mut rng = rand::thread_rng();
-		Process {
-			registers: [
-				1, 
-				-1, 
- 				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
-				rng.gen::<i32>(),
+			Process {
+				registers: [
+					1, 
+					-1, 
+ 					rng.gen::<i32>(),
+					rng.gen::<i32>(),
+					rng.gen::<i32>(),
+					rng.gen::<i32>(),
+					rng.gen::<i32>(),
+					rng.gen::<i32>(),
 				]
+			}
+		} else {
+			Process {
+				registers: [
+					1,
+					-1,
+					-3,
+					-3,
+					-3,
+					-3,
+					-3,
+					-3,
+				]
+			}
 		}
 	}
 	
@@ -184,7 +199,17 @@ fn parse_file() -> Result<(), ErrorKind>{
 		match fs::read_to_string(args[1].clone()) {
 			// interpret if read succesfully
 			Ok(_contents) => {
-				println!("Running file: {:?}\n", args[1]);
+				
+				let is_random = if args.len() > 2 {
+					match &args[2][..] {
+						"--random" => true,
+						_ => false,
+					}
+				} else {
+					false
+				};
+
+				println!("Running file: {:?} with random: {} \n", args[1], is_random);
 
 				// get lines
 				let lines: Vec<String> = _contents
@@ -193,7 +218,7 @@ fn parse_file() -> Result<(), ErrorKind>{
 					.collect();
 					
 					let instructions = read_instructions(lines);
-					let mut program = Process::new();
+					let mut program = Process::new(is_random);
 					program.run(instructions);
 					println!("Finished running");
 
@@ -212,10 +237,6 @@ fn parse_file() -> Result<(), ErrorKind>{
 	}
 }
 
-fn test() {
-	parse_file();
-}
-
 fn main() {
-	test();
+	parse_file().expect("could not run (great error message, I know)");
 }
