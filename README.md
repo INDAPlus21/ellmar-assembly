@@ -53,14 +53,14 @@ Running with optimzations is recommended for larger numbers.
 With optimizations I have computed 11! within seconds, and 12! in less
 than 2 minutes (I think).
 
-## mul.li
+### mul.li
 input number x + enter.
 
 input number y + enter.
 
 The program will output x*y.
 
-# Options
+## Options
 `cargo run *file_path* --random`, will initialize the registers with random
 values, except #0 and #1.
 
